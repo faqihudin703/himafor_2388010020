@@ -1,7 +1,7 @@
 name: Deploy Web Static to AWS EC2
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
