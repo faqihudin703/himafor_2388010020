@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HIMAFOR — Himpunan Mahasiswa Informatika</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Syne:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #020508;
+    --bg2: #060d14;
+    --cyan: #00f5ff;
+    --cyan-dim: rgba(0,245,255,0.12);
+    --cyan-glow: rgba(0,245,255,0.4);
+    --gold: #c8a84b;
+    --gold-dim: rgba(200,168,75,0.15);
+    --white: #e8edf2;
+    --muted: #4a6070;
+    --glass: rgba(0,245,255,0.04);
+    --border: rgba(0,245,255,0.15);
+    --border-gold: rgba(200,168,75,0.3);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Syne', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed; width: 10px; height: 10px;
+    background: var(--cyan); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%,-50%);
+    transition: transform 0.05s, opacity 0.2s;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    position: fixed; width: 36px; height: 36px;
+    border: 1px solid var(--cyan); border-radius: 50%;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%,-50%);
+    transition: transform 0.15s ease, width 0.2s, height 0.2s;
+    opacity: 0.5;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 1; opacity: 0.4;
+  }
+
+  /* GRID BACKGROUND */
+  .grid-bg {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridShift 20s linear infinite;
+  }
+  @keyframes gridShift {
+    0% { background-position: 0 0; }
+    100% { background-position: 60px 60px; }
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 4rem;
+    background: rgba(2,5,8,0.7);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.1rem; font-weight: 900;
+    color: var(--cyan);
+    letter-spacing: 0.3em;
+    text-shadow: 0 0 20px var(--cyan-glow);
+  }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; letter-spacing: 0.2em;
+    color: var(--muted); text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.3s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+    height: 1px; background: var(--cyan); transform: scaleX(0);
+    transition: transform 0.3s;
+  }
+  .nav-links a:hover { color: var(--cyan); }
+  .nav-links a:hover::after { transform: scaleX(1); }
+
+  /* HERO */
+  #hero {
+    position: relative; min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 8rem 4rem 6rem;
+    overflow: hidden;
+    z-index: 2;
+  }
+
+  .hero-scan {
+    position: absolute; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    animation: scanLine 4s linear infinite;
+    opacity: 0.4;
+  }
+  @keyframes scanLine {
+    0% { top: 0; }
+    100% { top: 100%; }
+  }
+
+  .hero-emblem {
+    position: relative; margin-bottom: 3rem;
+  }
+  .hero-emblem img {
+    width: 140px; height: 140px; object-fit: contain;
+    filter: drop-shadow(0 0 30px var(--cyan-glow)) brightness(1.1);
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+  .ring-outer {
+    position: absolute; inset: -20px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    animation: rotateCW 12s linear infinite;
+  }
+  .ring-inner {
+    position: absolute; inset: -8px;
+    border: 1px dashed rgba(200,168,75,0.3);
+    border-radius: 50%;
+    animation: rotateCCW 8s linear infinite;
+  }
+  @keyframes rotateCW { to { transform: rotate(360deg); } }
+  @keyframes rotateCCW { to { transform: rotate(-360deg); } }
+
+  .hero-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.5em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.3s ease forwards;
+  }
+  .hero-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    font-weight: 900;
+    line-height: 1;
+    text-align: center;
+    letter-spacing: 0.08em;
+    background: linear-gradient(135deg, #ffffff 0%, var(--cyan) 50%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.5s ease forwards;
+    position: relative;
+  }
+  .hero-title::after {
+    content: 'HIMAFOR';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #ffffff 0%, var(--cyan) 50%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: blur(20px);
+    opacity: 0.3;
+    z-index: -1;
+  }
+  .hero-sub {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(0.7rem, 1.5vw, 1rem);
+    letter-spacing: 0.4em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 0.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.7s ease forwards;
+  }
+  .hero-desc {
+    max-width: 600px; text-align: center;
+    font-size: 1.05rem; line-height: 1.8;
+    color: rgba(232,237,242,0.65);
+    margin-top: 2rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.9s ease forwards;
+  }
+  .hero-cta {
+    display: flex; gap: 1.2rem; margin-top: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 1.1s ease forwards;
+  }
+  .btn-primary {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.72rem; letter-spacing: 0.25em;
+    padding: 1rem 2.2rem;
+    background: transparent;
+    border: 1px solid var(--cyan);
+    color: var(--cyan);
+    text-decoration: none; text-transform: uppercase;
+    position: relative; overflow: hidden;
+    transition: color 0.3s;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+  .btn-primary::before {
+    content: ''; position: absolute; inset: 0;
+    background: var(--cyan); transform: translateX(-101%);
+    transition: transform 0.3s ease;
+    z-index: -1;
+  }
+  .btn-primary:hover { color: var(--bg); }
+  .btn-primary:hover::before { transform: translateX(0); }
+
+  .btn-secondary {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.72rem; letter-spacing: 0.25em;
+    padding: 1rem 2.2rem;
+    background: var(--gold-dim);
+    border: 1px solid var(--border-gold);
+    color: var(--gold);
+    text-decoration: none; text-transform: uppercase;
+    transition: background 0.3s, box-shadow 0.3s;
+    clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  }
+  .btn-secondary:hover {
+    background: rgba(200,168,75,0.25);
+    box-shadow: 0 0 20px rgba(200,168,75,0.2);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    position: relative; z-index: 2;
+    display: flex; justify-content: center; gap: 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,245,255,0.02);
+    backdrop-filter: blur(10px);
+  }
+  .stat-item {
+    flex: 1; max-width: 200px;
+    text-align: center; padding: 2rem 1.5rem;
+    border-right: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-item::before {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    transform: scaleX(0); transition: transform 0.4s;
+  }
+  .stat-item:hover::before { transform: scaleX(1); }
+  .stat-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 2rem; font-weight: 900;
+    color: var(--cyan);
+    text-shadow: 0 0 20px var(--cyan-glow);
+  }
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.3em;
+    color: var(--muted); text-transform: uppercase;
+    margin-top: 0.4rem;
+  }
+
+  /* SECTIONS */
+  section { position: relative; z-index: 2; }
+
+  .section-header {
+    text-align: center; margin-bottom: 4rem;
+  }
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.5em;
+    color: var(--gold); text-transform: uppercase;
+    display: block; margin-bottom: 0.8rem;
+  }
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.6rem, 4vw, 2.8rem);
+    font-weight: 700; letter-spacing: 0.05em;
+    background: linear-gradient(90deg, var(--white), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ABOUT */
+  #about {
+    padding: 8rem 4rem;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .about-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6rem;
+    align-items: center;
+  }
+  .about-visual {
+    position: relative;
+  }
+  .about-img-wrap {
+    position: relative; overflow: hidden;
+    clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));
+  }
+  .about-img-wrap img {
+    width: 100%; display: block;
+    filter: grayscale(20%) brightness(0.85) contrast(1.1);
+    transition: filter 0.4s;
+  }
+  .about-img-wrap:hover img { filter: grayscale(0%) brightness(1); }
+  .about-img-wrap::before {
+    content: ''; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(135deg, var(--cyan-dim), transparent 60%);
+    pointer-events: none;
+  }
+  .about-img-wrap::after {
+    content: ''; position: absolute; inset: 0; z-index: 2;
+    border: 1px solid var(--border);
+    clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));
+    pointer-events: none;
+  }
+  .about-corner {
+    position: absolute; width: 24px; height: 24px;
+    border-top: 2px solid var(--cyan); border-left: 2px solid var(--cyan);
+    top: -1px; left: -1px; z-index: 3;
+  }
+  .about-corner.br {
+    border: none; border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold);
+    top: auto; left: auto; bottom: -1px; right: -1px;
+  }
+  .about-text h3 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.5rem; font-weight: 700;
+    margin-bottom: 1.5rem; letter-spacing: 0.05em;
+    color: var(--white);
+  }
+  .about-text p {
+    font-size: 1rem; line-height: 1.9;
+    color: rgba(232,237,242,0.65);
+    margin-bottom: 1.2rem;
+  }
+  .about-badges {
+    display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2rem;
+  }
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.2em;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--border);
+    color: var(--cyan); background: var(--cyan-dim);
+    text-transform: uppercase;
+  }
+
+  /* VISI MISI */
+  #vision {
+    padding: 8rem 4rem;
+    background: linear-gradient(180deg, transparent, rgba(0,245,255,0.02), transparent);
+  }
+  .vision-inner { max-width: 1200px; margin: 0 auto; }
+  .vision-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+    margin-top: 1rem;
+  }
+  .vision-card {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    padding: 3rem;
+    position: relative; overflow: hidden;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .vision-card:hover {
+    border-color: var(--cyan);
+    background: rgba(0,245,255,0.06);
+  }
+  .vision-card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; width: 60px; height: 1px;
+    background: var(--cyan);
+  }
+  .vision-card::after {
+    content: ''; position: absolute;
+    top: 0; left: 0; width: 1px; height: 60px;
+    background: var(--cyan);
+  }
+  .vision-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 3rem; font-weight: 900;
+    color: var(--cyan-dim);
+    line-height: 1; margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+  .vision-card h3 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1rem; font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1rem;
+  }
+  .vision-card p {
+    font-size: 0.95rem; line-height: 1.85;
+    color: rgba(232,237,242,0.65);
+  }
+
+  /* DIVISI */
+  #divisions {
+    padding: 8rem 4rem;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .div-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+  }
+  .div-card {
+    background: var(--bg2);
+    padding: 2.5rem 2rem;
+    position: relative; overflow: hidden;
+    transition: background 0.3s;
+    cursor: default;
+  }
+  .div-card:hover { background: rgba(0,245,255,0.04); }
+  .div-icon {
+    font-size: 2rem; margin-bottom: 1.2rem;
+    display: block;
+    filter: drop-shadow(0 0 8px var(--cyan-glow));
+  }
+  .div-card h3 {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.85rem; font-weight: 600;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--cyan); margin-bottom: 0.8rem;
+  }
+  .div-card p {
+    font-size: 0.88rem; line-height: 1.7;
+    color: rgba(232,237,242,0.5);
+  }
+  .div-card .div-line {
+    position: absolute; bottom: 0; left: 0;
+    width: 0; height: 2px;
+    background: linear-gradient(90deg, var(--cyan), var(--gold));
+    transition: width 0.4s ease;
+  }
+  .div-card:hover .div-line { width: 100%; }
+
+  /* GALERI */
+  #gallery {
+    padding: 8rem 4rem;
+    background: rgba(0,245,255,0.01);
+  }
+  .gallery-inner { max-width: 1200px; margin: 0 auto; }
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 220px 220px;
+    gap: 3px;
+  }
+  .gallery-item {
+    position: relative; overflow: hidden;
+  }
+  .gallery-item:first-child { grid-row: span 2; }
+  .gallery-item img {
+    width: 100%; height: 100%; object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease, filter 0.4s;
+    filter: grayscale(30%) brightness(0.7);
+  }
+  .gallery-item:hover img {
+    transform: scale(1.06);
+    filter: grayscale(0%) brightness(0.9);
+  }
+  .gallery-item::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--cyan-dim), transparent);
+    opacity: 0; transition: opacity 0.4s;
+    pointer-events: none;
+  }
+  .gallery-item:hover::after { opacity: 1; }
+  .gallery-label {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 1rem 1.2rem;
+    background: linear-gradient(transparent, rgba(2,5,8,0.85));
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.25em;
+    color: var(--cyan); text-transform: uppercase;
+    transform: translateY(100%); transition: transform 0.3s;
+  }
+  .gallery-item:hover .gallery-label { transform: translateY(0); }
+
+  /* PROGRAM */
+  #programs {
+    padding: 8rem 4rem;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .prog-list { display: flex; flex-direction: column; gap: 1px; }
+  .prog-item {
+    display: grid; grid-template-columns: 80px 1fr auto;
+    align-items: center; gap: 2rem;
+    padding: 2rem 2.5rem;
+    border: 1px solid var(--border);
+    background: var(--glass);
+    transition: border-color 0.3s, background 0.3s;
+    position: relative; overflow: hidden;
+    cursor: default;
+  }
+  .prog-item::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 2px; background: var(--cyan);
+    transform: scaleY(0); transition: transform 0.3s;
+  }
+  .prog-item:hover { border-color: var(--border); background: rgba(0,245,255,0.04); }
+  .prog-item:hover::before { transform: scaleY(1); }
+  .prog-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.8rem; font-weight: 900;
+    color: rgba(0,245,255,0.2);
+    letter-spacing: -0.02em;
+  }
+  .prog-info h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem; font-weight: 600;
+    color: var(--white); margin-bottom: 0.3rem;
+  }
+  .prog-info p {
+    font-size: 0.85rem; color: var(--muted);
+  }
+  .prog-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem; letter-spacing: 0.2em;
+    padding: 0.35rem 0.8rem;
+    border: 1px solid var(--border-gold);
+    color: var(--gold); text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* KONTAK */
+  #contact {
+    padding: 8rem 4rem;
+    background: linear-gradient(180deg, transparent, rgba(0,245,255,0.03) 50%, transparent);
+  }
+  .contact-inner {
+    max-width: 900px; margin: 0 auto; text-align: center;
+  }
+  .contact-box {
+    margin-top: 4rem;
+    border: 1px solid var(--border);
+    padding: 4rem;
+    position: relative; overflow: hidden;
+    background: var(--glass);
+  }
+  .contact-box::before {
+    content: ''; position: absolute; inset: -50%;
+    background: radial-gradient(ellipse at center, rgba(0,245,255,0.04), transparent 60%);
+    animation: pulse 4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 0.5; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+  .contact-links {
+    display: flex; justify-content: center; gap: 1.5rem;
+    flex-wrap: wrap; margin-top: 2.5rem; position: relative; z-index: 1;
+  }
+  .contact-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; letter-spacing: 0.2em;
+    color: var(--muted); text-decoration: none;
+    text-transform: uppercase; padding: 0.8rem 1.5rem;
+    border: 1px solid var(--border);
+    transition: color 0.3s, border-color 0.3s, background 0.3s;
+  }
+  .contact-link:hover {
+    color: var(--cyan); border-color: var(--cyan);
+    background: var(--cyan-dim);
+  }
+  .contact-email {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.1rem; color: var(--cyan);
+    letter-spacing: 0.1em; position: relative; z-index: 1;
+    text-decoration: none;
+    text-shadow: 0 0 20px var(--cyan-glow);
+    display: block; margin-top: 1.5rem;
+  }
+
+  /* FOOTER */
+  footer {
+    position: relative; z-index: 2;
+    padding: 2rem 4rem;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem; font-weight: 900;
+    color: var(--cyan); letter-spacing: 0.3em;
+  }
+  .footer-copy {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem; color: var(--muted); letter-spacing: 0.2em;
+  }
+  .footer-line {
+    position: absolute; top: 0; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0.5;
+  }
+
+  /* SCROLL REVEAL */
+  .reveal {
+    opacity: 0; transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1; transform: translateY(0);
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--cyan); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { gap: 1.2rem; }
+    #hero, #about, #divisions, #programs, #contact, #gallery { padding: 6rem 1.5rem; }
+    #vision { padding: 6rem 1.5rem; }
+    .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .vision-grid { grid-template-columns: 1fr; }
+    .div-grid { grid-template-columns: 1fr 1fr; }
+    .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+    .gallery-item:first-child { grid-row: span 1; }
+    .stats-bar { flex-wrap: wrap; }
+    .stat-item { min-width: 50%; border-right: none; border-bottom: 1px solid var(--border); }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="grid-bg"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">HIMAFOR</div>
+  <ul class="nav-links">
+    <li><a href="#about">Tentang</a></li>
+    <li><a href="#vision">Visi & Misi</a></li>
+    <li><a href="#divisions">Divisi</a></li>
+    <li><a href="#programs">Program</a></li>
+    <li><a href="#contact">Kontak</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-scan"></div>
+
+  <div class="hero-emblem">
+    <div class="ring-outer"></div>
+    <div class="ring-inner"></div>
+    <img src="https://cdn-icons-png.flaticon.com/512/2010/2010990.png" alt="HIMAFOR Emblem">
+  </div>
+
+  <span class="hero-tag">// Himpunan Mahasiswa Informatika</span>
+  <h1 class="hero-title">HIMAFOR</h1>
+  <p class="hero-sub">Universitas · Program Studi Informatika</p>
+  <p class="hero-desc">
+    Menggerakkan ekosistem teknologi kampus — dari riset mutakhir, pengembangan produk,
+    hingga komunitas inovator masa depan yang siap menghadapi tantangan era digital.
+  </p>
+  <div class="hero-cta">
+    <a href="#about" class="btn-primary">Explore</a>
+    <a href="#contact" class="btn-secondary">Bergabung</a>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-num" data-count="500">0</div>
+    <div class="stat-label">Anggota Aktif</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" data-count="12">0</div>
+    <div class="stat-label">Divisi & Komunitas</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" data-count="48">0</div>
+    <div class="stat-label">Program Kerja</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" data-count="7">0</div>
+    <div class="stat-label">Tahun Berdiri</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" data-count="120">0</div>
+    <div class="stat-label">Prestasi & Awards</div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-visual reveal">
+      <div class="about-img-wrap">
+        <img src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=700&q=80" alt="Himpunan Informatika">
+        <div class="about-corner"></div>
+        <div class="about-corner br"></div>
+      </div>
+    </div>
+    <div class="about-text reveal">
+      <div class="section-header" style="text-align:left; margin-bottom:2rem;">
+        <span class="section-tag">// 01 · Tentang Kami</span>
+        <h2 class="section-title">Lebih dari Sekadar<br>Himpunan</h2>
+      </div>
+      <p>
+        HIMAFOR adalah rumah bagi para pemikir, pembangun, dan inovator di bidang informatika.
+        Kami hadir sebagai katalisator pertumbuhan akademik dan profesional mahasiswa — menghubungkan
+        dunia kampus dengan industri teknologi yang terus bergerak cepat.
+      </p>
+      <p>
+        Berdiri di atas fondasi kolaborasi dan semangat eksplorasi, setiap program kami dirancang
+        untuk membentuk individu yang kompeten, berkarakter, dan siap berkontribusi nyata
+        bagi masyarakat melalui teknologi.
+      </p>
+      <div class="about-badges">
+        <span class="badge">Blockchain</span>
+        <span class="badge">AI & ML</span>
+        <span class="badge">Cybersecurity</span>
+        <span class="badge">Web Development</span>
+        <span class="badge">Networking</span>
+        <span class="badge">Data Science</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VISI MISI -->
+<section id="vision">
+  <div class="vision-inner">
+    <div class="section-header reveal">
+      <span class="section-tag">// 02 · Visi & Misi</span>
+      <h2 class="section-title">Arah & Tujuan</h2>
+    </div>
+    <div class="vision-grid">
+      <div class="vision-card reveal">
+        <div class="vision-num">01</div>
+        <h3>Visi</h3>
+        <p>
+          Menjadi himpunan mahasiswa informatika yang visioner, inklusif, dan berdampak — membentuk
+          generasi teknolog yang mampu memimpin transformasi digital bangsa dengan integritas,
+          kreativitas, dan keahlian kelas dunia.
+        </p>
+      </div>
+      <div class="vision-card reveal">
+        <div class="vision-num">02</div>
+        <h3>Misi Pertama</h3>
+        <p>
+          Membangun ekosistem belajar yang kondusif melalui program akademik, workshop teknis,
+          dan forum diskusi yang mendorong pertumbuhan kompetensi anggota secara berkelanjutan
+          di berbagai bidang ilmu informatika.
+        </p>
+      </div>
+      <div class="vision-card reveal">
+        <div class="vision-num">03</div>
+        <h3>Misi Kedua</h3>
+        <p>
+          Menjalin kemitraan strategis dengan industri, startup, dan komunitas teknologi untuk
+          memperluas jaringan dan membuka peluang nyata bagi anggota dalam karier maupun
+          entrepreneurship di bidang teknologi.
+        </p>
+      </div>
+      <div class="vision-card reveal">
+        <div class="vision-num">04</div>
+        <h3>Misi Ketiga</h3>
+        <p>
+          Mendorong budaya inovasi dan riset terapan yang menghasilkan produk, solusi, dan
+          karya yang memberikan dampak positif bagi masyarakat luas — dari skala lokal
+          hingga nasional dan global.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIVISI -->
+<section id="divisions">
+  <div class="section-header reveal">
+    <span class="section-tag">// 03 · Divisi Kami</span>
+    <h2 class="section-title">Unit & Komunitas</h2>
+  </div>
+  <div class="div-grid">
+    <div class="div-card reveal">
+      <span class="div-icon">⛓</span>
+      <h3>Blockchain Lab</h3>
+      <p>Riset dan pengembangan teknologi Web3, smart contract, DeFi, dan ekosistem on-chain berbasis Solana & EVM.</p>
+      <div class="div-line"></div>
+    </div>
+    <div class="div-card reveal">
+      <span class="div-icon">🤖</span>
+      <h3>AI & Machine Learning</h3>
+      <p>Eksplorasi deep learning, computer vision, NLP, dan deployment model AI untuk kebutuhan nyata.</p>
+      <div class="div-line"></div>
+    </div>
+    <div class="div-card reveal">
+      <span class="div-icon">🔐</span>
+      <h3>Cybersecurity</h3>
+      <p>CTF competition, ethical hacking, network security, dan security awareness untuk ekosistem digital yang aman.</p>
+      <div class="div-line"></div>
+    </div>
+    <div class="div-card reveal">
+      <span class="div-icon">🌐</span>
+      <h3>Web & Mobile Dev</h3>
+      <p>Pengembangan aplikasi modern berbasis React, Next.js, Flutter, dan berbagai framework terkini.</p>
+      <div class="div-line"></div>
+    </div>
+    <div class="div-card reveal">
+      <span class="div-icon">📡</span>
+      <h3>Networking & Cloud</h3>
+      <p>Infrastruktur server, homelab, cloud computing, dan administrasi sistem jaringan skala enterprise.</p>
+      <div class="div-line"></div>
+    </div>
+    <div class="div-card reveal">
+      <span class="div-icon">📊</span>
+      <h3>Data Science</h3>
+      <p>Analitik data, visualisasi, big data processing, dan transformasi data menjadi insight yang berdampak.</p>
+      <div class="div-line"></div>
+    </div>
+    <div class="div-card reveal">
+      <span class="div-icon">🎮</span>
+      <h3>Game Development</h3>
+      <p>Desain dan pengembangan game indie menggunakan Unity, Godot, dan teknologi real-time rendering.</p>
+      <div class="div-line"></div>
+    </div>
+    <div class="div-card reveal">
+      <span class="div-icon">🎨</span>
+      <h3>UI/UX & Design</h3>
+      <p>Riset pengguna, desain antarmuka, prototyping Figma, dan pengalaman pengguna yang human-centered.</p>
+      <div class="div-line"></div>
+    </div>
+    <div class="div-card reveal">
+      <span class="div-icon">📣</span>
+      <h3>Media & Humas</h3>
+      <p>Komunikasi organisasi, konten digital, branding himpunan, dan dokumentasi kegiatan secara profesional.</p>
+      <div class="div-line"></div>
+    </div>
+  </div>
+</section>
+
+<!-- GALERI -->
+<section id="gallery">
+  <div class="gallery-inner">
+    <div class="section-header reveal">
+      <span class="section-tag">// 04 · Galeri Kegiatan</span>
+      <h2 class="section-title">Momen & Jejak</h2>
+    </div>
+    <div class="gallery-grid reveal">
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80" alt="Tech Conference">
+        <div class="gallery-label">Tech Conference 2024</div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=500&q=80" alt="Hackathon">
+        <div class="gallery-label">Hackathon Season 3</div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=500&q=80" alt="Workshop">
+        <div class="gallery-label">Workshop ML</div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=500&q=80" alt="Seminar">
+        <div class="gallery-label">National Seminar</div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=500&q=80" alt="Team Building">
+        <div class="gallery-label">Team Building 2025</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROGRAM KERJA -->
+<section id="programs">
+  <div class="section-header reveal">
+    <span class="section-tag">// 05 · Program Kerja</span>
+    <h2 class="section-title">Inisiatif & Agenda</h2>
+  </div>
+  <div class="prog-list">
+    <div class="prog-item reveal">
+      <div class="prog-num">01</div>
+      <div class="prog-info">
+        <h3>HIMAFOR Tech Summit</h3>
+        <p>Konferensi teknologi tahunan menghadirkan pembicara industri, demo produk, dan sesi networking eksklusif</p>
+      </div>
+      <div class="prog-tag">Tahunan</div>
+    </div>
+    <div class="prog-item reveal">
+      <div class="prog-num">02</div>
+      <div class="prog-info">
+        <h3>Infinity Hackathon</h3>
+        <p>Kompetisi inovasi 48 jam membangun produk teknologi berdampak dengan mentoring dari founder startup</p>
+      </div>
+      <div class="prog-tag">Semester I</div>
+    </div>
+    <div class="prog-item reveal">
+      <div class="prog-num">03</div>
+      <div class="prog-info">
+        <h3>DevClass Series</h3>
+        <p>Workshop intensif mingguan mencakup Web3, AI, Cybersecurity, dan Cloud — dipandu oleh praktisi aktif industri</p>
+      </div>
+      <div class="prog-tag">Mingguan</div>
+    </div>
+    <div class="prog-item reveal">
+      <div class="prog-num">04</div>
+      <div class="prog-info">
+        <h3>Open Source Sprint</h3>
+        <p>Kolaborasi membangun dan berkontribusi pada proyek open source nyata yang digunakan komunitas luas</p>
+      </div>
+      <div class="prog-tag">Semester II</div>
+    </div>
+    <div class="prog-item reveal">
+      <div class="prog-num">05</div>
+      <div class="prog-info">
+        <h3>Industry Connect</h3>
+        <p>Program magang, company visit, dan mentoring yang menghubungkan anggota dengan perusahaan teknologi terkemuka</p>
+      </div>
+      <div class="prog-tag">Rutin</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="section-header reveal">
+      <span class="section-tag">// 06 · Kontak & Bergabung</span>
+      <h2 class="section-title">Mulai Perjalananmu</h2>
+    </div>
+    <div class="contact-box reveal">
+      <p style="color: rgba(232,237,242,0.6); line-height: 1.8; max-width:500px; margin: 0 auto; position:relative; z-index:1;">
+        Apakah kamu mahasiswa informatika yang ingin berkembang, berinovasi, dan terhubung
+        dengan komunitas teknologi terbaik? Pintu HIMAFOR selalu terbuka.
+      </p>
+      <a href="mailto:himafor@kampus.ac.id" class="contact-email">himafor@kampus.ac.id</a>
+      <div class="contact-links">
+        <a href="#" class="contact-link">Instagram</a>
+        <a href="#" class="contact-link">LinkedIn</a>
+        <a href="#" class="contact-link">GitHub</a>
+        <a href="#" class="contact-link">Discord</a>
+        <a href="#" class="contact-link">YouTube</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-line"></div>
+  <div class="footer-logo">HIMAFOR</div>
+  <div class="footer-copy">© 2025 Himpunan Mahasiswa Informatika — All Rights Reserved</div>
+</footer>
+
+<script>
+  // Custom Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animateCursor() {
+    cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+  document.querySelectorAll('a, button, .div-card, .prog-item').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      ring.style.width = '56px'; ring.style.height = '56px';
+      cursor.style.transform = 'translate(-50%,-50%) scale(0.4)';
+    });
+    el.addEventListener('mouseleave', () => {
+      ring.style.width = '36px'; ring.style.height = '36px';
+      cursor.style.transform = 'translate(-50%,-50%) scale(1)';
+    });
+  });
+
+  // Scroll Reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Counter Animation
+  const counters = document.querySelectorAll('[data-count]');
+  const cObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const el = e.target;
+        const target = +el.dataset.count;
+        const suffix = target >= 100 ? '+' : target >= 10 && el.closest('.stat-item').querySelector('.stat-label').textContent.includes('Tahun') ? '' : '+';
+        let current = 0;
+        const step = target / 60;
+        const timer = setInterval(() => {
+          current = Math.min(current + step, target);
+          el.textContent = Math.floor(current) + (current >= target ? suffix : '');
+          if (current >= target) clearInterval(timer);
+        }, 16);
+        cObs.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+  counters.forEach(c => cObs.observe(c));
+</script>
+</body>
+</html>
