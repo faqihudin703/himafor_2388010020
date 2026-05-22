@@ -29,7 +29,7 @@ services:
       DB_NAME: dbcompro_2388010020
       DB_HOST: db-webdinamis
       NEXTAUTH_SECRET: adm-serv-web-bebas-saja-32-karekter
-      NEXTAUTH_URL: http://3.106.132.7:3000
+      NEXTAUTH_URL: http://3.27.242.170:3000
     depends_on:
       - db-webdinamis
 
