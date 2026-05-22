@@ -1,7 +1,0 @@
-services:
-  himafor_2388010020:
-    image: faqih703/himafor_2388010020:latest
-    container_name: himafor_2388010020
-    restart: always
-    ports:
-      - "80:80"
